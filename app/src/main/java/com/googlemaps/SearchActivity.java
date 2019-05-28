@@ -59,15 +59,37 @@ public class SearchActivity extends FragmentActivity implements OnMapReadyCallba
                int position = SearchArrayList(etCityname.getText().toString());
                if (position > -1)
                    loadMap(position);
-else
+                    else
                    Toast.makeText(SearchActivity.this, "Location not found by name : " + etCityname.getText().toString(), Toast.LENGTH_SHORT).show();
 
            }
 
            private void loadMap(int position) {
+               //Remove old marker from the map
+               if (markerName!= null)
+               {
+                   markerName.remove();
+               }
+
+               double latitude = longitudeLatitudesList.get(position).getLat();
+               double longitude = longitudeLatitudesList.get(position).getLon();
+               String marker = longitudeLatitudesList.get(position).getMarker();
+               center = CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude));
+               zoom =  CameraUpdateFactory.zoomTo(17);
+               markerName = mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title(marker));
+               mMap.moveCamera(center);
+               mMap.animateCamera(zoom);
+               mMap.getUiSettings().setZoomControlsEnabled(true);
            }
 
-           private int SearchArrayList(String toString) {
+           private int SearchArrayList(String name) {
+               for (int  i =0; i < longitudeLatitudesList.size(); i++) {
+                   if (longitudeLatitudesList.get(i).getMarker().contains(name)){
+                       return i;
+                   }
+               }
+               return -1;
+
            }
        });
 
@@ -95,6 +117,7 @@ else
 
 
         //  This function will check weather
+
     }
 
 
@@ -110,10 +133,12 @@ else
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        center = CameraUpdateFactory.newLatLng(new LatLng(27.7172453, 85.3239605));
+        zoom = CameraUpdateFactory.zoomTo(15);
+        mMap.moveCamera(center);
+        mMap.animateCamera(zoom);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
     }
 }
